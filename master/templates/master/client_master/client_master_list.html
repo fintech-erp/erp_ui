@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .card-grid {
+    transition: 0.3s;
+  }
+
+  .card-grid:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  }
+</style>
+<div class="card ">
+
+  <div class="card-header">
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="btn btn-primary" href="{% url 'client-master-create' %}"><i class="fas fa-plus"></i> Add New</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="card-body">
+    <h5 class="mb-4">Client Master</h5>
+    <table id="clientMasterTable" class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <!-- <th>#</th> -->
+          <th>Name</th>
+          <th>Mobile Number</th>
+          <th>Permanent Address</th>
+          <th>Citizenship Number</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock content %}
+
+{% block javascript %}
+<script>
+
+  $(document).ready(function () {
+    loadClientMasterList("{% url 'client-master-lists' %}");
+  })
+
+
+  $(function () {
+    $('#data-table').DataTable();
+
+    $('#grid-view-btn').on('click', function () {
+      $('#list-view').addClass('d-none');
+      $('#grid-view').removeClass('d-none');
+    });
+
+    $('#list-view-btn').on('click', function () {
+      $('#grid-view').addClass('d-none');
+      $('#list-view').removeClass('d-none');
+    });
+  });
+
+
+  function loadClientMasterList(requestUrl) {
+    $.ajax({
+      url: requestUrl,
+      method: "GET",
+      dataType: "json",
+      contentType: "application/json",
+      success: function (data) {
+        $('#clientMasterTable tbody').empty();
+
+        var data = data.datas;
+
+        data.forEach(function (item) {
+          var tr = `
+            <tr>
+              <td>${item.clientMasterFirstName} ${item.clientMasterLastName}</td>
+              <td>${item.clientMasterMobileNumber}</td>
+              <td>${item.clientMasterPermanentMunicipalityName}, ${item.clientMasterPermanentDistrictName}</td>
+              <td>${item.clientMasterCitizenshipNumber}</td>
+              <td>
+                <button type="button" class="btn btn-sm btn-info" onclick="showUpdatePage('/master/clientMaster/${item.referenceId}/update')"><i class="fas fa-edit"></i></button>
+              </td>
+            </tr>
+            
+            `;
+
+          $('#clientMasterTable tbody').append(tr);
+        });
+      },
+      error: function (jqXHR, textStatus, errorMessage) {
+        console.error('Error loading inquiry follow-up:', errorMessage);
+      }
+    });
+  }
+</script>
+{% endblock javascript %}
